@@ -141,13 +141,11 @@
     const chatBox = document.getElementById("chat-box");
     const storageKey = "chatHistory";
 
-    // Récupère l'heure actuelle au format HH:MM
     function getTime() {
       const now = new Date();
       return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
-    // Ajoute un message à la vue et au localStorage
     function appendMessage(text, type, time) {
       const message = document.createElement("div");
       message.classList.add("message", type);
@@ -155,13 +153,11 @@
       chatBox.appendChild(message);
       chatBox.scrollTop = chatBox.scrollHeight;
 
-      // Sauvegarder
       const history = JSON.parse(localStorage.getItem(storageKey)) || [];
       history.push({ text, type, time });
       localStorage.setItem(storageKey, JSON.stringify(history));
     }
 
-    // Recharger l'historique
     function loadHistory() {
       const history = JSON.parse(localStorage.getItem(storageKey)) || [];
       history.forEach(({ text, type, time }) => {
@@ -178,18 +174,9 @@
       appendMessage(userText, "user", userTime);
       inputField.value = "";
 
-      appendMessage("...", "bot", getTime());
-
       try {
         const res = await fetch(`https://kaiz-apis.gleeze.com/api/gpt-4o?ask=${encodeURIComponent(userText)}&uid=1&webSearch=On`);
         const data = await res.json();
-
-        // Supprimer le "..." précédent
-        const lastBotMessage = document.querySelector(".message.bot:last-child");
-        if (lastBotMessage && lastBotMessage.innerText.trim() === "...") {
-          lastBotMessage.remove();
-        }
-
         appendMessage(data.response || "Aucune réponse.", "bot", getTime());
       } catch (error) {
         appendMessage("Erreur lors de l'appel à l'API.", "bot", getTime());

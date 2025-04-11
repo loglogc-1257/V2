@@ -5,52 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Stanley Chat</title>
   <style>
-    :root {
-      --primary: #4ca1af;
-      --secondary: #2c3e50;
-      --light: #f4f4f4;
-      --bubble-user: linear-gradient(135deg, #4ca1af, #2c3e50);
-      --bubble-bot: #e0e0e0;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(-45deg, #4ca1af, #2c3e50, #4ca1af, #2c3e50);
-      background-size: 400% 400%;
-      animation: bgAnim 15s ease infinite;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
       display: flex;
       flex-direction: column;
       height: 100vh;
     }
 
-    @keyframes bgAnim {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
     header {
-      background: rgba(255, 255, 255, 0.1);
+      background: linear-gradient(135deg, #2c3e50, #4ca1af);
       color: white;
+      padding: 20px;
       text-align: center;
-      padding: 25px 20px;
-      backdrop-filter: blur(6px);
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 36px;
-    }
-
-    header p {
-      margin: 8px 0 0;
-      font-size: 16px;
-      color: #e0f0f0;
     }
 
     #chat-container {
@@ -70,99 +38,82 @@
     }
 
     .message {
-      max-width: 75%;
-      padding: 12px 18px;
-      border-radius: 18px;
-      margin-bottom: 12px;
-      line-height: 1.5;
+      max-width: 70%;
+      padding: 10px 15px;
+      border-radius: 15px;
+      margin-bottom: 10px;
+      line-height: 1.4;
       position: relative;
-      animation: fadeIn 0.4s ease-in-out;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      word-wrap: break-word;
-    }
-
-    .user {
-      align-self: flex-end;
-      background: var(--bubble-user);
-      color: white;
-      border-bottom-right-radius: 0;
-    }
-
-    .bot {
-      align-self: flex-start;
-      background: var(--bubble-bot);
-      color: #333;
-      border-bottom-left-radius: 0;
+      transition: all 0.3s ease;
     }
 
     .timestamp {
       font-size: 10px;
-      color: #999;
-      margin-top: 6px;
+      color: #777;
+      margin-top: 4px;
       text-align: right;
+    }
+
+    .user {
+      background-color: #4ca1af;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 0;
+    }
+
+    .bot {
+      background-color: #e0e0e0;
+      align-self: flex-start;
+      border-bottom-left-radius: 0;
     }
 
     #input-area {
       display: flex;
-      padding: 12px;
-      background-color: #ffffff;
-      border-top: 1px solid #ddd;
+      padding: 10px;
+      background-color: #fff;
+      border-top: 1px solid #ccc;
     }
 
     #userInput {
       flex: 1;
-      padding: 12px;
+      padding: 10px;
       font-size: 16px;
       border: 1px solid #ccc;
-      border-radius: 25px;
-      outline: none;
+      border-radius: 20px;
       margin-right: 10px;
-      transition: border 0.3s ease;
-    }
-
-    #userInput:focus {
-      border-color: var(--primary);
+      outline: none;
     }
 
     button {
-      background: var(--primary);
+      background-color: #4ca1af;
       color: white;
       border: none;
       padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 25px;
+      border-radius: 20px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      font-size: 16px;
     }
 
     button:hover {
-      background: #3b8ca5;
+      background-color: #3b8ca5;
     }
 
     #footer {
-      background: rgba(255, 255, 255, 0.08);
+      background: #2c3e50;
       color: white;
       padding: 20px;
       text-align: center;
-      font-size: 14px;
-      backdrop-filter: blur(6px);
     }
 
     #footer img {
       max-width: 100px;
       margin: 10px;
-      border-radius: 12px;
     }
 
-    @media (max-width: 768px) {
-      .message {
-        max-width: 90%;
+    @media (min-width: 768px) {
+      #footer img {
+        max-width: 150px;
       }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -170,7 +121,7 @@
 
   <header>
     <h1>Stanley</h1>
-    <p>Pose-moi toutes tes questions sur Medicare</p>
+    <p>Ask me anything about Medicare</p>
   </header>
 
   <div id="chat-container">
@@ -182,14 +133,16 @@
   </div>
 
   <div id="footer">
-    <div id="special-thanks">Avec tout le soutien de Stanley</div>
-    <img src="media/image1.png" alt="Logo 1">
-    <img src="media/image2.png" alt="Logo 2">
+    <div id="special-thanks">Stanley !</div>
+    <img src="media/image1.png" alt="WorkWonder Logo">
+    <img src="media/image2.png" alt="Stanley">
   </div>
 
   <script>
     const chatBox = document.getElementById("chat-box");
     const storageKey = "chatHistory";
+    const sendButton = document.querySelector("button");
+    const inputField = document.getElementById("userInput");
 
     function getTime() {
       const now = new Date();
@@ -200,7 +153,16 @@
       const message = document.createElement("div");
       message.classList.add("message", type);
       message.innerHTML = `${text}<div class="timestamp">${time}</div>`;
+      message.style.opacity = 0;
+      message.style.transform = "translateY(20px)";
       chatBox.appendChild(message);
+
+      setTimeout(() => {
+        message.style.transition = "all 0.3s ease";
+        message.style.opacity = 1;
+        message.style.transform = "translateY(0)";
+      }, 10);
+
       chatBox.scrollTop = chatBox.scrollHeight;
 
       const history = JSON.parse(localStorage.getItem(storageKey)) || [];
@@ -216,25 +178,41 @@
     }
 
     async function askQuestion() {
-      const inputField = document.getElementById("userInput");
       const userText = inputField.value.trim();
       if (!userText) return;
 
       const userTime = getTime();
       appendMessage(userText, "user", userTime);
       inputField.value = "";
+      inputField.disabled = true;
+      sendButton.disabled = true;
+
+      // Affiche "Le bot écrit..." pendant le chargement
+      const typingMsg = document.createElement("div");
+      typingMsg.classList.add("message", "bot");
+      typingMsg.setAttribute("id", "typing");
+      typingMsg.textContent = "Le bot écrit...";
+      chatBox.appendChild(typingMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
 
       try {
         const res = await fetch(`https://kaiz-apis.gleeze.com/api/gpt-4o?ask=${encodeURIComponent(userText)}&uid=1&webSearch=On`);
         const data = await res.json();
+
+        document.getElementById("typing").remove();
         appendMessage(data.response || "Aucune réponse.", "bot", getTime());
       } catch (error) {
-        appendMessage("Erreur de l'API.", "bot", getTime());
+        document.getElementById("typing").remove();
+        appendMessage("Erreur lors de l'appel à l'API.", "bot", getTime());
         console.error(error);
+      } finally {
+        inputField.disabled = false;
+        sendButton.disabled = false;
+        inputField.focus();
       }
     }
 
-    document.getElementById("userInput").addEventListener("keypress", function(e) {
+    inputField.addEventListener("keypress", function(e) {
       if (e.key === "Enter") askQuestion();
     });
 

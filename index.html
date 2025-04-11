@@ -6,46 +6,51 @@
   <title>Stanley Chat</title>
   <style>
     :root {
-      --user-color: #4ca1af;
-      --bot-color: #ffffff;
-      --bot-bg: #e8f0fe;
-      --user-bg: linear-gradient(135deg, #4ca1af, #2c3e50);
+      --primary: #4ca1af;
+      --secondary: #2c3e50;
+      --light: #f4f4f4;
+      --bubble-user: linear-gradient(135deg, #4ca1af, #2c3e50);
+      --bubble-bot: #e0e0e0;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(-45deg, #1e3c72, #2a5298, #1e3c72, #2a5298);
+      background: linear-gradient(-45deg, #4ca1af, #2c3e50, #4ca1af, #2c3e50);
       background-size: 400% 400%;
-      animation: gradientBG 12s ease infinite;
+      animation: bgAnim 15s ease infinite;
       display: flex;
       flex-direction: column;
       height: 100vh;
-      color: #333;
     }
 
-    @keyframes gradientBG {
+    @keyframes bgAnim {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
 
     header {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.1);
       color: white;
       text-align: center;
-      padding: 30px 20px;
-      backdrop-filter: blur(8px);
+      padding: 25px 20px;
+      backdrop-filter: blur(6px);
     }
 
     header h1 {
-      font-size: 40px;
       margin: 0;
+      font-size: 36px;
     }
 
     header p {
-      font-size: 18px;
-      margin-top: 10px;
+      margin: 8px 0 0;
+      font-size: 16px;
+      color: #e0f0f0;
     }
 
     #chat-container {
@@ -69,38 +74,39 @@
       padding: 12px 18px;
       border-radius: 18px;
       margin-bottom: 12px;
-      position: relative;
       line-height: 1.5;
-      animation: fadeIn 0.3s ease-in-out;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      position: relative;
+      animation: fadeIn 0.4s ease-in-out;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      word-wrap: break-word;
     }
 
     .user {
       align-self: flex-end;
-      background: var(--user-bg);
+      background: var(--bubble-user);
       color: white;
-      border-bottom-right-radius: 4px;
+      border-bottom-right-radius: 0;
     }
 
     .bot {
       align-self: flex-start;
-      background: var(--bot-bg);
+      background: var(--bubble-bot);
       color: #333;
-      border-bottom-left-radius: 4px;
+      border-bottom-left-radius: 0;
     }
 
     .timestamp {
       font-size: 10px;
-      color: #aaa;
+      color: #999;
       margin-top: 6px;
       text-align: right;
     }
 
     #input-area {
       display: flex;
-      padding: 10px;
-      background-color: #fff;
-      border-top: 1px solid #ccc;
+      padding: 12px;
+      background-color: #ffffff;
+      border-top: 1px solid #ddd;
     }
 
     #userInput {
@@ -111,33 +117,34 @@
       border-radius: 25px;
       outline: none;
       margin-right: 10px;
-      transition: border 0.3s;
+      transition: border 0.3s ease;
     }
 
     #userInput:focus {
-      border-color: var(--user-color);
+      border-color: var(--primary);
     }
 
     button {
-      background: var(--user-bg);
+      background: var(--primary);
       color: white;
       border: none;
-      padding: 12px 20px;
+      padding: 10px 20px;
       font-size: 16px;
       border-radius: 25px;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: background 0.3s ease;
     }
 
     button:hover {
-      filter: brightness(1.1);
+      background: #3b8ca5;
     }
 
     #footer {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.08);
       color: white;
       padding: 20px;
       text-align: center;
+      font-size: 14px;
       backdrop-filter: blur(6px);
     }
 
@@ -147,15 +154,15 @@
       border-radius: 12px;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
       .message {
         max-width: 90%;
       }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -163,7 +170,7 @@
 
   <header>
     <h1>Stanley</h1>
-    <p>Pose-moi n’importe quelle question</p>
+    <p>Pose-moi toutes tes questions sur Medicare</p>
   </header>
 
   <div id="chat-container">
@@ -175,7 +182,7 @@
   </div>
 
   <div id="footer">
-    <div id="special-thanks">Stanley !</div>
+    <div id="special-thanks">Avec tout le soutien de Stanley</div>
     <img src="media/image1.png" alt="Logo 1">
     <img src="media/image2.png" alt="Logo 2">
   </div>
@@ -222,7 +229,7 @@
         const data = await res.json();
         appendMessage(data.response || "Aucune réponse.", "bot", getTime());
       } catch (error) {
-        appendMessage("Erreur lors de l'appel à l'API.", "bot", getTime());
+        appendMessage("Erreur de l'API.", "bot", getTime());
         console.error(error);
       }
     }

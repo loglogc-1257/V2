@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -34,6 +34,7 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
+      scroll-behavior: smooth;
     }
 
     .message {
@@ -42,6 +43,14 @@
       border-radius: 15px;
       margin-bottom: 10px;
       line-height: 1.4;
+      position: relative;
+    }
+
+    .timestamp {
+      font-size: 10px;
+      color: #777;
+      margin-top: 4px;
+      text-align: right;
     }
 
     .user {
@@ -130,13 +139,34 @@
 
   <script>
     const chatBox = document.getElementById("chat-box");
+    const storageKey = "chatHistory";
 
-    function appendMessage(text, type) {
+    // Récupère l'heure actuelle au format HH:MM
+    function getTime() {
+      const now = new Date();
+      return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    // Ajoute un message à la vue et au localStorage
+    function appendMessage(text, type, time) {
       const message = document.createElement("div");
       message.classList.add("message", type);
-      message.textContent = text;
+      message.innerHTML = `${text}<div class="timestamp">${time}</div>`;
       chatBox.appendChild(message);
       chatBox.scrollTop = chatBox.scrollHeight;
+
+      // Sauvegarder
+      const history = JSON.parse(localStorage.getItem(storageKey)) || [];
+      history.push({ text, type, time });
+      localStorage.setItem(storageKey, JSON.stringify(history));
+    }
+
+    // Recharger l'historique
+    function loadHistory() {
+      const history = JSON.parse(localStorage.getItem(storageKey)) || [];
+      history.forEach(({ text, type, time }) => {
+        appendMessage(text, type, time);
+      });
     }
 
     async function askQuestion() {
@@ -144,10 +174,11 @@
       const userText = inputField.value.trim();
       if (!userText) return;
 
-      appendMessage(userText, "user");
+      const userTime = getTime();
+      appendMessage(userText, "user", userTime);
       inputField.value = "";
 
-      appendMessage("...", "bot");
+      appendMessage("...", "bot", getTime());
 
       try {
         const res = await fetch(`https://kaiz-apis.gleeze.com/api/gpt-4o?ask=${encodeURIComponent(userText)}&uid=1&webSearch=On`);
@@ -155,23 +186,22 @@
 
         // Supprimer le "..." précédent
         const lastBotMessage = document.querySelector(".message.bot:last-child");
-        if (lastBotMessage && lastBotMessage.textContent === "...") {
+        if (lastBotMessage && lastBotMessage.innerText.trim() === "...") {
           lastBotMessage.remove();
         }
 
-        appendMessage(data.response || "Aucune réponse.", "bot");
+        appendMessage(data.response || "Aucune réponse.", "bot", getTime());
       } catch (error) {
-        appendMessage("Erreur lors de l'appel à l'API.", "bot");
+        appendMessage("Erreur lors de l'appel à l'API.", "bot", getTime());
         console.error(error);
       }
     }
 
-    // Envoyer avec Entrée
     document.getElementById("userInput").addEventListener("keypress", function(e) {
-      if (e.key === "Enter") {
-        askQuestion();
-      }
+      if (e.key === "Enter") askQuestion();
     });
+
+    loadHistory();
   </script>
 
 </body>

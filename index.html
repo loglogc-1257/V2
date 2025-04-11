@@ -1,119 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stanley</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stanley Chat</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
-      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      background-color: #f4f4f4;
-      color: #333;
+      height: 100vh;
     }
 
     header {
-      width: 100%;
-      padding: 40px 20px;
       background: linear-gradient(135deg, #2c3e50, #4ca1af);
       color: white;
-      text-align: center;
-      box-sizing: border-box;
-    }
-
-    header h1 {
-      font-size: 36px;
-      margin: 0;
-    }
-
-    header p {
-      font-size: 18px;
-      margin: 10px 0 0;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 1200px;
       padding: 20px;
-      box-sizing: border-box;
+      text-align: center;
+    }
+
+    #chat-container {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      overflow: hidden;
     }
 
-    .card {
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 10px;
+    #chat-box {
+      flex: 1;
       padding: 20px;
-      margin: 20px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      width: 90%;
-      max-width: 600px;
-      box-sizing: border-box;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
 
-    .card header {
-      background: linear-gradient(135deg, #2c3e50, #4ca1af);
+    .message {
+      max-width: 70%;
+      padding: 10px 15px;
+      border-radius: 15px;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .user {
+      background-color: #4ca1af;
       color: white;
-      padding: 10px;
-      border-radius: 10px 10px 0 0;
-      font-size: 20px;
-      margin: -20px -20px 20px -20px;
+      align-self: flex-end;
+      border-bottom-right-radius: 0;
     }
 
-    input[type="text"], button {
-      width: 100%;
+    .bot {
+      background-color: #e0e0e0;
+      align-self: flex-start;
+      border-bottom-left-radius: 0;
+    }
+
+    #input-area {
+      display: flex;
       padding: 10px;
-      margin-top: 10px;
+      background-color: #fff;
+      border-top: 1px solid #ccc;
+    }
+
+    #userInput {
+      flex: 1;
+      padding: 10px;
       font-size: 16px;
-      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      margin-right: 10px;
+      outline: none;
     }
 
     button {
-      background: #4ca1af;
+      background-color: #4ca1af;
       color: white;
       border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
       cursor: pointer;
-      border-radius: 5px;
+      font-size: 16px;
     }
 
     button:hover {
-      background: #3b8ca5;
-    }
-
-    #response {
-      margin-top: 15px;
-      background: #eee;
-      padding: 10px;
-      border-radius: 5px;
-      white-space: pre-wrap;
+      background-color: #3b8ca5;
     }
 
     #footer {
-      width: 100%;
       background: #2c3e50;
       color: white;
       padding: 20px;
       text-align: center;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
 
     #footer img {
       max-width: 100px;
-      height: auto;
       margin: 10px;
-    }
-
-    #special-thanks {
-      margin: 10px 0;
     }
 
     @media (min-width: 768px) {
@@ -126,53 +110,68 @@
 <body>
 
   <header>
-    <h1>Welcome</h1>
-    <p>Let us answer your questions on Medicare</p>
+    <h1>Stanley</h1>
+    <p>Ask me anything about Medicare</p>
   </header>
 
-  <div class="card">
-    <header>Ask the AI</header>
-    <div class="card-content">
-      <input type="text" id="userInput" placeholder="Ask something..." />
-      <button onclick="askQuestion()">Send</button>
-      <div id="response"></div>
-    </div>
-  </div>
-
-  <div class="card">
-    <header>About Us</header>
-    <div class="card-content">
-      <!-- Put about us content here -->
+  <div id="chat-container">
+    <div id="chat-box"></div>
+    <div id="input-area">
+      <input type="text" id="userInput" placeholder="Écris un message..." />
+      <button onclick="askQuestion()">Envoyer</button>
     </div>
   </div>
 
   <div id="footer">
-    <p><div id="special-thanks">Stanley !</div>
-    <img id="logo-left" src="media/image1.png" alt="WorkWonder Logo">
-    <img id="logo-right" src="media/image2.png" alt="stanley">
+    <div id="special-thanks">Stanley !</div>
+    <img src="media/image1.png" alt="WorkWonder Logo">
+    <img src="media/image2.png" alt="Stanley">
   </div>
 
   <script>
+    const chatBox = document.getElementById("chat-box");
+
+    function appendMessage(text, type) {
+      const message = document.createElement("div");
+      message.classList.add("message", type);
+      message.textContent = text;
+      chatBox.appendChild(message);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
     async function askQuestion() {
-      const input = document.getElementById("userInput").value;
-      const responseBox = document.getElementById("response");
+      const inputField = document.getElementById("userInput");
+      const userText = inputField.value.trim();
+      if (!userText) return;
 
-      if (!input.trim()) {
-        responseBox.innerText = "Please enter a question.";
-        return;
-      }
+      appendMessage(userText, "user");
+      inputField.value = "";
 
-      responseBox.innerText = "Loading...";
+      appendMessage("...", "bot");
 
       try {
-        const res = await fetch(`https://kaiz-apis.gleeze.com/api/gpt-4o?ask=${encodeURIComponent(input)}&uid=1&webSearch=On`);
+        const res = await fetch(`https://kaiz-apis.gleeze.com/api/gpt-4o?ask=${encodeURIComponent(userText)}&uid=1&webSearch=On`);
         const data = await res.json();
-        responseBox.innerText = data.response || "No response received.";
+
+        // Supprimer le "..." précédent
+        const lastBotMessage = document.querySelector(".message.bot:last-child");
+        if (lastBotMessage && lastBotMessage.textContent === "...") {
+          lastBotMessage.remove();
+        }
+
+        appendMessage(data.response || "Aucune réponse.", "bot");
       } catch (error) {
-        responseBox.innerText = "Error contacting the API.";
+        appendMessage("Erreur lors de l'appel à l'API.", "bot");
         console.error(error);
       }
     }
+
+    // Envoyer avec Entrée
+    document.getElementById("userInput").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        askQuestion();
+      }
+    });
   </script>
 
 </body>
